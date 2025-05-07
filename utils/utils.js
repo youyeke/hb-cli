@@ -1,6 +1,7 @@
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
+const fsPromises = require('fs/promises');
 const cp = require("child_process");
 const JSON5 = require("json5");
 var iconv = require("iconv-lite");
@@ -250,7 +251,7 @@ function RunCli(cli, callback) {
  * @param {object} HBuilderConfig
  * @returns {Promise<Array>}
  */
-function buildWgtCli(HBuilderConfig) {
+function buildWgtCli(HBuilderConfig, manifest) {
   return new Promise((resolve, reject) => {
     var apps = [];
     RunCli(
@@ -263,7 +264,7 @@ function buildWgtCli(HBuilderConfig) {
         "--project",
         HBuilderConfig.project,
         "--name",
-        `${HBuilderConfig.project}.wgt`,
+        `${manifest.name}_${manifest.versionName}_${+new Date()}.wgt`,
       ],
       function (code, data) {
         if (code == 0) {
@@ -462,6 +463,11 @@ function openDirectory(filePath) {
     console.log(`Directory opened successfully.`);
   });
 }
+
+function renameFile(filePath, newFilePath) {
+  return fsPromises.rename(filePath, newFilePath)
+}
+
 module.exports = {
   openDefaultBrowser,
   getLocalIP,
@@ -476,5 +482,6 @@ module.exports = {
   OpenWifiDebug,
   ConnectPhoneWithWifi,
   GetUrl,
-  openDirectory
+  openDirectory,
+  renameFile,
 };

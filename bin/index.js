@@ -4,6 +4,7 @@
 
 const inquirer = require("inquirer");
 const dayjs = require("dayjs");
+const path = require("path");
 const utils = require("../utils/utils.js");
 const merge = require("../utils/merge.js");
 const gen = require("../utils/gen.js");
@@ -291,6 +292,8 @@ async function handlePrompt(
             manifest.name + "_" + dayjs().format("YYYYMMDDHHmm") + ".ipa"
           );
         } else if (appUrl) {
+          utils.renameFile(appUrl, path.join(process.cwd(), `./unpackage/release/${manifest.name}_${manifest.versionName}_${+new Date()}.apk`))
+          return
           // 安卓才打开浏览器，ios直接打开没用，所有暂时不打开
 
           var url = `http://${utils.getLocalIP()}:${
@@ -314,7 +317,7 @@ async function handlePrompt(
         }
       });
     } else if (answers.platform == "wgt") {
-      let apps = await utils.buildWgtCli(HBuilderConfig);
+      let apps = await utils.buildWgtCli(HBuilderConfig, manifest);
       if (process.platform == "win32") {
         for (let i = 0; i < apps.length; i++) {
           console.log("explorer.exe /select," + apps[i]);
